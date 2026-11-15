@@ -3,6 +3,7 @@ import QtQuick
 import QtQuick.Effects
 import "../../Theme"
 import "../../Utils"
+import "../../Widgets"
 
 // The search card: a bar that grows a list of applications below it when the query isn't empty.
 // Matches the names, generic names, keywords (the desktop entries' aliases) and ids of the
@@ -305,15 +306,13 @@ Item {
                         color: Qt.rgba(Theme.text.r, Theme.text.g, Theme.text.b, 0.14)
                     }
 
-                    Image {
+                    ThemedIcon {
                         id: icon
                         anchors { left: parent.left; leftMargin: 12; verticalCenter: parent.verticalCenter }
                         width: 32; height: 32
                         sourceSize: Qt.size(64, 64)
-                        fillMode: Image.PreserveAspectFit
-                        smooth: true
-                        asynchronous: true
                         source: AppIcons.lookup(row.modelData.icon) || AppIcons.lookup(row.modelData.id)
+                        appName: row.modelData.id
                     }
 
                     Column {
