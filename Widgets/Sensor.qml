@@ -24,11 +24,11 @@ Row {
         }
         if (name == 'battery') {
             const pct = UPower.displayDevice.percentage
-            const col = pct >= 0.9 ? "#51b34a" : Qt.rgba(
-                (1 - pct / 0.9),
-                (180 / 255) * (pct / 0.9),
-                0, 1
-            )
+            // red -> yellow -> green. Green is reached at 90%.
+            const red = Qt.color("#ff0000"), yellow = Qt.color("#f5c542"), green = Qt.color("#51b34a")
+            const mix = (a, b, t) => Qt.rgba(a.r + (b.r - a.r) * t, a.g + (b.g - a.g) * t, a.b + (b.b - a.b) * t, 1)
+            const t = Math.min(pct / 0.9, 1)
+            const col = t < 0.5 ? mix(red, yellow, t / 0.5) : mix(yellow, green, (t - 0.5) / 0.5)
             const bat_ico = () => {
                 const icons = [
                     ['󰁺', '󰢜'],  // 0-10%
