@@ -6,6 +6,7 @@ hl.layer_rule({ match = { namespace = "swaync-notification-window" }, blur = tru
 hl.layer_rule({ match = { namespace = "waybar" },                     blur = true, ignore_alpha = 0.1 })
 hl.layer_rule({ match = { namespace = "quickshell" },                 blur = true, ignore_alpha = 0.1, no_anim = true })
 hl.layer_rule({ match = { namespace = "quickshell-notifications" }, blur = true, ignore_alpha = 0.5, no_anim = true }) -- notification cards (alpha 0.68) are blurred, their drop shadow (Theme.shadow_color, alpha < 0.5) isn't
+hl.layer_rule({ match = { namespace = "quickshell-osd" },           blur = true, ignore_alpha = 0.5, no_anim = true }) -- volume OSD pill (alpha 0.8) is blurred, its drop shadow (alpha 0.35) isn't
 hl.layer_rule({ match = { namespace = "quickshell-search" },        blur = true, ignore_alpha = 0.5, no_anim = false, animation = "fade" }) -- app search card (alpha 0.68) is blurred, its drop shadow isn't; Hyprland fades the whole layer in/out (layersIn / layersOut, fadeLayersIn / fadeLayersOut)
 hl.layer_rule({ match = { namespace = "quickshell-lock" },            blur = false, no_anim = true }) -- lockscreen fade overlay: opacity is animated in QML
 hl.layer_rule({ match = { namespace = "quickshell-desktop" },        blur = false, order = -1 }) -- desktop icons: no blur; order -1 keeps them above the wallpaper layer (awww)

@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Hyprland
@@ -43,9 +44,14 @@ Item {
             // Only as big as the strip the pill slides through (not full-screen), so each
             // animation frame only damages/recomposites this small area.
             anchors { top: true }
-            implicitWidth:       root.implicitWidth
-            implicitHeight:      120   // shown margin (<= ~40) + pill (40) + spring overshoot
+            // room for the pill's drop shadow (Theme.shadow_*) on either side and below it
+            readonly property real shadowPad: Theme.shadow_blur * Theme.shadow_blur_max + Math.abs(Theme.shadow_offset)
+            implicitWidth:       root.implicitWidth + 2 * shadowPad
+            implicitHeight:      120 + shadowPad   // shown margin (<= ~40) + pill (40) + spring overshoot + shadow
             WlrLayershell.layer: WlrLayer.Overlay
+            // own namespace so Hyprland can blur the pill but not its drop shadow
+            // (layer rule in ~/.config/hypr/modules/windowrules.lua)
+            WlrLayershell.namespace: "quickshell-osd"
             exclusionMode:       ExclusionMode.Ignore
             mask:                Region {}
             color:               "transparent"
@@ -112,6 +118,77 @@ Item {
                         mass:    Theme.springMass
                         epsilon: Theme.springEpsilon
                     }
+                }
+
+                // Drop shadow
+                
+                Item {
+                    id: pillShadow
+                    readonly property real pad: panelRoot.shadowPad
+                    z: -1
+                    x: -pad
+                    y: -pad
+                    width: root.width + 2 * pad
+                    height: root.height + 2 * pad
+
+                    RectangularShadow {
+                        x: pillShadow.pad
+                        y: pillShadow.pad
+                        width: root.width
+                        height: root.height
+                        radius: root.radius
+                        blur: Theme.shadow_blur * Theme.shadow_blur_max
+                        offset: Qt.vector2d(0, Theme.shadow_offset)
+                        color: Theme.shadow_color
+                    }
+
+                    // the pill's shape, cut out of the shadow; 1 px smaller so the mask's soft edge
+                    // falls under the pill instead of leaving a light seam around it
+                    Item {
+                        id: pillShadowHole
+                        anchors.fill: parent
+                        visible: false
+                        layer.enabled: true
+                        Rectangle {
+                            x: pillShadow.pad + 1
+                            y: pillShadow.pad + 1
+                            width: root.width - 2
+                            height: root.height - 2
+                            radius: root.radius - 1
+                        }
+                    }
+
+                    layer.enabled: true
+                    layer.effect: MultiEffect {
+                        maskEnabled: true
+                        maskInverted: true
+                        maskSource: pillShadowHole
+                    }
+                }
+
+                // glass rim
+
+                Rectangle {
+                    id: rimShape
+                    anchors.fill: parent
+                    radius: root.radius
+                    visible: false
+                    layer.enabled: true
+                    layer.smooth: true
+                    layer.textureSize: Qt.size(width * 4, height * 4)
+                }
+
+                ShaderEffect {
+                    anchors.fill: parent
+                    property variant source: rimShape
+                    property size texel: Qt.size(1 / Math.max(1, width), 1 / Math.max(1, height))
+                    property real rimPx: Theme.rim_width
+                    property real strength: Theme.rim_opacity
+                    fragmentShader: Qt.resolvedUrl("../Widgets/shaders/glass_rim.frag.qsb")
+                    layer.enabled: true
+                    layer.smooth: true
+                    layer.mipmap: true
+                    layer.textureSize: Qt.size(width * 4, height * 4)
                 }
 
                 Rectangle {
