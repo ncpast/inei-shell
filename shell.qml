@@ -11,6 +11,7 @@ import "./Popups/"
 import "./Theme"
 import "./Utils"
 import "./OSD"
+import "./OSD/Search"
 import "./Notifications"
 import "./Lock"
 import "./apps/settings"
@@ -44,6 +45,7 @@ ShellRoot {
 
         Scope {
             VolumeOSD {}
+            Search {}
             Desktop {}
             FocusBackdrop {}
             Notifications { id: notifications }
