@@ -2,14 +2,14 @@ pragma Singleton
 import QtQuick
 
 QtObject {
-    readonly property color background:  '#121318'   // hardest bg, bar base
-    readonly property color background1: '#1e1f25'   // default bg
-    readonly property color background2: '#33343a'   // raised surface
+    readonly property color background:  '#11140f'   // hardest bg, bar base
+    readonly property color background1: '#1d211b'   // default bg
+    readonly property color background2: '#32362f'   // raised surface
 
-    readonly property color border_light: '#45464f'  // subtle dividers
-    readonly property color border:       '#8f909a'  // dividers
+    readonly property color border_light: '#43483f'  // subtle dividers
+    readonly property color border:       '#8d9387'  // dividers
 
-    readonly property color surface:      '#121318'  // panels / popovers
-    readonly property color text:         '#dbe1ff'  // primary text
-    readonly property color accent:       '#b3c5ff'  // orange (unchanged)
+    readonly property color surface:      '#11140f'  // panels / popovers
+    readonly property color text:         '#c1efaf'  // primary text
+    readonly property color accent:       '#a5d395'  // orange (unchanged)
 }

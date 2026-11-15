@@ -300,7 +300,7 @@ Item {
 
                     Rectangle {
                         anchors.fill: parent
-                        radius: 18
+                        radius: 18 + root.listPad / 2
                         visible: row.index === root.selected
                         color: Qt.rgba(Theme.text.r, Theme.text.g, Theme.text.b, 0.14)
                     }

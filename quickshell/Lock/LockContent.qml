@@ -111,8 +111,8 @@ Item {
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: Qt.formatTime(clock.date, "HH:mm")
                     color: "white"
-                    font.family: "Inter"
-                    font.weight: Font.Bold
+                    font.family: Theme.lock_screen_font
+                    font.weight: Font.Normal
                     font.pixelSize: 140
                     font.letterSpacing: -4
                 }

@@ -29,24 +29,10 @@ local function setup_plugins()
 
                 icon_on_hover = true,
 
-                -- on_double_click = [[hyprctl dispatch 'hl.dsp.window.fullscreen({ mode = "maximized", action = "toggle" })']],
-                bar_precedence_over_border = false,
+                on_double_click = [[hyprctl dispatch 'hl.dsp.window.pin()']],
+                bar_precedence_over_border = true,
                 bar_part_of_window = true,
                 enabled = true,
-            },
-
-            overview = {
-                hideTopLayers     = false,
-                hideRealLayers    = false,
-                hideOverlayLayers = false,
-                reservedArea      = 33,
-                autoDrag          = false,
-
-                workspaceActiveBorder = colors.accent,
-                workspaceBorderSize   = 2,
-
-                disableBlur = false,
-                affectStrut = false,
             },
 
             dynamic_cursors = {

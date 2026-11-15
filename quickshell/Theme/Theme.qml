@@ -3,6 +3,7 @@ import QtQuick
 
 QtObject {
     readonly property string sound_theme: "ocean" // change this to whatever sound theme you have installed 
+    readonly property string lock_screen_font: "MatrixType"
 
     readonly property int   top_panel_height: 33
     readonly property int   left_panel_width: 0 + 54
@@ -11,7 +12,7 @@ QtObject {
 
     // ---- App icon style (desktop + top bar) --------------------------------------------------------
     // If several are on: tinted > coloured > dark mode.
-    property bool tintDesktopIcons: false       // iOS "liquid glass": accent tile + glyph, frosted wallpaper behind
+    property bool tintDesktopIcons: true       // iOS "liquid glass": accent tile + glyph, frosted wallpaper behind
     property bool coloredIcons:     false       // dark tile, logo in the tile's own colours (Steam: blue on dark)
     property bool darkModeIcons:    true        // white parts (logos, tiles) turn desktop_icon_dark_color
 

@@ -24,7 +24,17 @@ Item {
     property real titleFade: 1
 
     property string activeTitle: HyprEvents.activeWindowTitle
+    property string previousActiveTitle: undefined
     property bool showWorkspaces: HyprEvents.currentlySwitchingWorkspaces
+
+    onActiveTitleChanged: {
+        if (!previousActiveTitle) {
+            previousActiveTitle = activeTitle
+            
+        } else if (previousActiveTitle === activeTitle) {
+            
+        }
+    }
 
     TextMetrics {
         id: mediaMetrics
