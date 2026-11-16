@@ -21,11 +21,16 @@ QtObject {
     //   keepWhite: true    keep white enclosed by the logo (Brave's face) when darkening
     //   coloredIcon: bool  coloured mode for this app or not, overriding coloredIcons
     //   glyphScale: < 1    tinted mode: shrink a symbol that runs off its tile
+    //   detail: true       tinted mode: keep the symbol's parts distinguishable (a calculator's screen and
+    //                      keys) instead of one flat colour
+    //   detailRef: 0..1    with detail: x position where the symbol's main body is plain (default 0.3), the
+    //                      brightness there is what lighter parts (a screen) are compared against
+    
     readonly property var iconOptions: ({
         "brave":            { keepWhite: true },
         "codium":           { darkMode: false },
         "nautilus":         { keepWhite: true },
-        "calculator":       { darkMode: false },
+        "calc":             { darkMode: false, detail: true },
         "steam":            { coloredIcon: darkModeIcons },
         "discord":          { coloredIcon: darkModeIcons },
         "counter-strike-2": { coloredIcon: darkModeIcons, glyphScale: 0.9 }

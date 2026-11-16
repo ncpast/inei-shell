@@ -208,6 +208,8 @@ Item {
             property real tileOpacity: Theme.desktop_icon_tile_opacity
             property real gloss: Theme.desktop_icon_gloss
             property real glyphScale: root.appOptions.glyphScale ?? 1
+            property real glyphDetail: root.appOptions.detail ? 1 : 0
+            property real detailRef: root.appOptions.detailRef ?? 0.3
             fragmentShader: Qt.resolvedUrl("shaders/tinted_icon.frag.qsb")
             layer.enabled: true
             layer.smooth: true
