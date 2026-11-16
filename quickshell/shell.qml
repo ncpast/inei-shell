@@ -7,6 +7,7 @@ import QtQuick
 import "./Bars"
 import "./Decor"
 import "./Desktop"
+import "./Dock"
 import "./Popups/"
 import "./Theme"
 import "./Utils"
@@ -75,6 +76,9 @@ ShellRoot {
 
             LeftBar { exclusionMode: ExclusionMode.Ignore }
             TopBar { exclusionMode: ExclusionMode.Ignore }
+
+            // after the bars: surfaces on the same layer stack in the order they appear
+            Dock {}
     
             PowerOverlay {
                 id: powerOverlay

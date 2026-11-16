@@ -44,6 +44,7 @@ hl.gesture({
 -- focus-mode aware: black & white kitty on a focus-mode workspace (modules/focusmode.lua)
 hl.bind(mainMod .. " + Q",      function() FocusMode.terminal() end,                   { description = "terminal" })
 hl.bind(mainMod .. " + C",      hl.dsp.window.close(),                                 { description = "close-window" })
+hl.bind(mainMod .. " + D",      function() Minimize.active() end,                                 { description = "minimize-window" })
 hl.bind(mainMod .. " + E",      hl.dsp.exec_cmd(fileManager),                          { description = "file-manager" })
 hl.bind(mainMod .. " + SPACE",  hl.dsp.exec_cmd(menu),                                 { description = "launcher" })
 hl.bind(mainMod .. " + L",      hl.dsp.exec_cmd("qs ipc call lock lock"),             { description = "lock-screen" })

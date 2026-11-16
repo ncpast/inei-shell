@@ -100,7 +100,7 @@ local function setup_plugins()
         fg_color = "rgb(febb31)",
         size     = 16,
         icon     = "",
-        action   = [[hyprctl dispatch 'hl.dsp.window.fullscreen({ mode = "maximized", action = "toggle" })']],
+        action   = [[hyprctl dispatch 'function() Minimize.active() end']],
     })
     
     hl.plugin.hyprbars.add_button({

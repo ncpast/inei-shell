@@ -258,6 +258,13 @@ Row {
             type: "command",
             action: ["hyprctl", "dispatch", "hl.dsp.window.fullscreen({ mode = \"fullscreen\", action = \"toggle\" })"]
         },
+        "Minimize": {
+            label: "Minimize",
+            icon: "",
+            type: "command",
+            action: ["hyprctl", "dispatch", "function() Minimize.active() end"],
+            shortcut: "minimize-window"
+        },
         "Close Window": {
             label: "Close",
             icon: "󰅙",
@@ -302,18 +309,13 @@ Row {
             label: "Dock",
             icon: "󱂩",
             type: "setter",
-            action: () => { console.log('hi') }
-        },
-        "Compact Mode": {
-            label: "Compact Mode",
-            type: "setter",
-            toggled: Theme.leftBarHidden,
-            action: () => { Theme.leftBarHidden = !Theme.leftBarHidden }
+            toggled: Theme.dock_enabled,
+            action: () => { Theme.dock_enabled = !Theme.dock_enabled }
         },
         "Focus Mode": {
             label: "Focus Mode",
             type: "setter",
-            // global: every workspace
+            icon: "󰈈",
             toggled: FocusMode.global,
             action: () => { FocusMode.toggleGlobal() }
         },
@@ -340,7 +342,7 @@ Row {
     })
 
     Repeater {
-        model: ["System", "Workspace", "Window", "View", "Network", "Programs"]
+        model: ["System", "Workspace", "Window", "View", "Programs"]
 
         Rectangle {
             id: delegateRoot
@@ -426,7 +428,7 @@ Row {
 
     Dropdown {
         id: windowDropdown
-        property var content: ["Close Window", "Maximize", "Fullscreen", "Pin Window", "br", 
+        property var content: ["Close Window", "Maximize", "Fullscreen", "Minimize", "Pin Window", "br", 
         "Move to Workspace", "Move to New Workspace", "br", "Toggle Floating", "Enable Pseudotiling"]
         property var category: "Window"
     }
@@ -439,7 +441,7 @@ Row {
 
     Dropdown {
         id: viewDropdown
-        property var content: ["Compact Mode", "Focus Mode", "br", "Toggle Dock", "Automatic Tiling"]
+        property var content: ["Focus Mode", "Toggle Dock", "Automatic Tiling"]
         property var category: "View"
     }
 }

@@ -10,7 +10,7 @@ QtObject {
     readonly property int   spacer_panel_size: 0 + 8
     property bool leftBarHidden: true
 
-    // ---- App icon style (desktop + top bar) --------------------------------------------------------
+    // App Icon Styles //
     // If several are on: tinted > coloured > dark mode.
     property bool tintDesktopIcons: true       // iOS "liquid glass": accent tile + glyph, frosted wallpaper behind
     property bool coloredIcons:     false       // dark tile, logo in the tile's own colours (Steam: blue on dark)
@@ -101,6 +101,40 @@ QtObject {
     readonly property int   text_shadow_blur_max: 8
     readonly property real  text_shadow_offset: 1
 
+    // Dock //
+    // The dock sizes itself to its icons: dock width = icons + spacing + padding.
+    property bool           dock_enabled:         true
+    readonly property bool  dock_autohide:        true
+    readonly property int   dock_icon_size:       52    // at rest
+    readonly property real  dock_magnification:   1.4   // size multiplier of the icon under the cursor
+    readonly property real  dock_magnify_range:   150   // how far the magnification reaches along the dock
+    readonly property int   dock_spacing:         8
+    readonly property int   dock_padding:         10
+    readonly property int   dock_margin_bottom:   8
+    readonly property int   dock_radius:          22
+    readonly property real  dock_opacity:         0.8
+    readonly property int   dock_trigger_height:  2     // bottom screen mouse trigger height
+    readonly property int   dock_hide_delay:      700   // time until the dock hides itself
+    readonly property int   dock_magnify_duration: 150  // how long the magnification takes to grow / shrink
+    readonly property int   dock_resize_duration: 250   // how long an icon takes to grow in / shrink out when it's added or removed (a window minimized / restored)
+    // running apps: glowing border in the accent colour
+    readonly property real  dock_icon_corner:     0.225 // corner radius of an icon's border / glow, as a fraction of its size
+    readonly property real  dock_glow_width:      1
+    readonly property real  dock_glow_blur:       9
+    readonly property real  dock_glow_opacity:    0.5
+    readonly property bool  dock_minimized_preview: true
+
+    readonly property var dock_pinned: [
+        { name: "Files",        icon: "files",    command: ["nautilus"],  match: ["nautilus"] },
+        { name: "Calculator",   icon: "calc",     command: ["qs", "ipc", "call", "calculator", "open"], match: [] },
+        { name: "Brave",        icon: "brave",    command: ["brave"],     match: ["brave-browser"] },
+        { name: "Terminal",     icon: "terminal", command: ["kitty"],     match: ["kitty"] },
+        { name: "Code",         icon: "codium",   command: ["codium"],    match: [] },
+        { name: "Discord",      icon: "discord",  command: ["discord"],   match: [] },
+        { name: "Telegram",     icon: "telegram", command: ["flatpak", "run", "org.telegram.desktop"], match: [] },
+        { name: "Steam",        icon: "steam",    command: ["steam"],     match: [] },
+        { name: "Spotify",      icon: "spotify",  command: ["flatpak", "run", "com.spotify.Client"], match: [] }
+    ]
+
     readonly property int   animation_speed_desktops: 1000
-    //readonly property int active_window_name_offset: 50
 }

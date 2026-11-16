@@ -12,6 +12,8 @@ import ".."
 
 PanelWindow {
         WlrLayershell.keyboardFocus: visible ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
+        WlrLayershell.namespace: "quickshell-systemdropdown"
+
         Shortcut {
             sequence: "Escape"
             enabled: root.systemMenuOpen
@@ -84,7 +86,7 @@ PanelWindow {
                         property var item: root.systemMenuItems[modelData] || root.trayPrograms[modelData] || {}
                         property var isSubmenu: item.type === "submenu" 
                         property bool itemEnabled: {
-                            if (item.label === "Dock" || item.type === "info")
+                            if (item.type === "info")
                                 return false
                             if (!item.requirements) 
                                 return true
@@ -127,7 +129,7 @@ PanelWindow {
                             anchors.rightMargin: 10
                             spacing: 8
 
-                            // tray programs: the program's own tray icon, its white parts tinted to Theme.text
+                            // Tray programs
                             MonoTintIcon {
                                 visible: item.type === "trayitem"
                                 Layout.preferredWidth: 16
