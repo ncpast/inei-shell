@@ -8,6 +8,7 @@ import QtQuick.Layouts
 import Quickshell.Wayland
 import "../../Theme"
 import "../../Utils"
+import ".."
 
 PanelWindow {
         WlrLayershell.keyboardFocus: visible ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
@@ -43,6 +44,32 @@ PanelWindow {
             //border.color: Theme.border
             //border.width: 1
 
+            // wide liquid glass rim (Widgets/shaders/wide_glass_rim.frag) around the menu, drawn from a
+            // hidden copy of its shape; supersampled so it's anti-aliased. Declared before the rows, so
+            // the hover highlights draw over it.
+            Rectangle {
+                id: rimShape
+                anchors.fill: parent
+                radius: buttonWrapper.radius
+                visible: false
+                layer.enabled: true
+                layer.smooth: true
+                layer.textureSize: Qt.size(width * 4, height * 4)
+            }
+            ShaderEffect {
+                anchors.fill: parent
+                property variant source: rimShape
+                property size texel: Qt.size(1 / Math.max(1, width), 1 / Math.max(1, height))
+                property real rimPx: Theme.wide_rim_width
+                property real strength: Theme.wide_rim_opacity
+                property real reach: Theme.wide_rim_reach / 2
+                fragmentShader: Qt.resolvedUrl("../shaders/wide_glass_rim.frag.qsb")
+                layer.enabled: true
+                layer.smooth: true
+                layer.mipmap: true
+                layer.textureSize: Qt.size(width * 4, height * 4)
+            }
+
             Column {
                 id: menuColumn
                 anchors.left: parent.left
@@ -58,10 +85,10 @@ PanelWindow {
                     id: systemRepeater
 
                     Rectangle {
-                        property var item: root.systemMenuItems[modelData] || {}
+                        property var item: root.systemMenuItems[modelData] || root.trayPrograms[modelData] || {}
                         property var isSubmenu: item.type === "submenu" 
                         property bool itemEnabled: {
-                            if (item.label === "Dock")
+                            if (item.label === "Dock" || item.type === "info")
                                 return false
                             if (!item.requirements) 
                                 return true
@@ -104,13 +131,21 @@ PanelWindow {
                             anchors.rightMargin: 10
                             spacing: 8
 
+                            // tray programs: the program's own tray icon, its white parts tinted to Theme.text
+                            MonoTintIcon {
+                                visible: item.type === "trayitem"
+                                Layout.preferredWidth: 16
+                                Layout.preferredHeight: 16
+                                source: item.type === "trayitem" ? item.icon : ""
+                            }
+
                             Text {
                                 opacity: itemEnabled ? 1 : 0.6
                                 text: item.icon || ''
                                 font.pixelSize: 10
                                 color: Theme.text
                                 //Layout.preferredWidth: 10
-                                visible: item.icon !== undefined
+                                visible: item.icon !== undefined && item.type !== "trayitem"
                                 Layout.fillHeight: true
                                 verticalAlignment: Text.AlignVCenter
                                 horizontalAlignment: Text.AlignHCenter
@@ -120,6 +155,7 @@ PanelWindow {
                                 opacity: itemEnabled ? 1 : 0.6
                                 font.weight: Font.Medium
                                 id: choiceLabel
+                                elide: Text.ElideRight
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
                                 verticalAlignment: Text.AlignVCenter
@@ -159,11 +195,16 @@ PanelWindow {
                             anchors.fill: parent
                             hoverEnabled: itemEnabled
                             cursorShape: itemEnabled ? Qt.PointingHandCursor : undefined
-                            onClicked: {
+                            acceptedButtons: Qt.LeftButton | Qt.RightButton
+                            onClicked: event => {
                                 if (!itemEnabled) return;
-                                if (item.type == "command" && item.action)
+                                if (event.button === Qt.RightButton) {
+                                    // right click only does something for entries that define it (tray programs: quit)
+                                    if (!item.rightclickaction) return;
+                                    item.rightclickaction();
+                                } else if (item.type == "command" && item.action)
                                     Quickshell.execDetached(item.action);
-                                else if (item.type == "setter" && item.action)
+                                else if ((item.type == "setter" || item.type == "trayitem") && item.action)
                                     item.action();
                                 root.systemMenuOpen = false
                                 root.menuOpen = ""

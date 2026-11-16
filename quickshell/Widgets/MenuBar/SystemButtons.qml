@@ -6,6 +6,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell.Hyprland
 import Quickshell.Io
+import Quickshell.Services.SystemTray
 import "../../Theme"
 import "../../Utils"
 
@@ -63,7 +64,92 @@ Row {
         }
     }
 
+    // Tray items // 
+
+    readonly property var hiddenTrayPrograms: ["udiskie"]
+    function isHiddenTray(item) {
+        var key = ((item.id || "") + " " + (item.title || "")).toLowerCase()
+        for (var i = 0; i < hiddenTrayPrograms.length; i++)
+            if (key.indexOf(hiddenTrayPrograms[i]) !== -1) return true
+        return false
+    }
+
+    readonly property var trayItems: SystemTray.items.values.filter(item => !root.isHiddenTray(item))
+
+    // One menu opener per tray item, kept alive so the item's menu entries are loaded by the time
+    // it is right-clicked (closeTrayProgram looks for a "Quit" entry in them).
+    Instantiator {
+        id: trayOpeners
+        model: ScriptModel { values: root.trayItems }
+        delegate: QsMenuOpener {
+            required property var modelData
+            property var trayItem: modelData
+            menu: modelData.menu
+        }
+    }
+
+    // Quit a tray app: prefer its own "Quit"/"Exit" menu entry (a graceful quit that works even
+    // when the app has no window, e.g. minimised to tray); otherwise ask Hyprland to close a
+    // window whose class matches the tray id.
+    function closeTrayProgram(item) {
+        var opener = null
+        for (var k = 0; k < trayOpeners.count; k++) {
+            var o = trayOpeners.objectAt(k)
+            if (o && o.trayItem === item) { opener = o; break }
+        }
+        var entries = opener && opener.children ? opener.children.values : []
+        for (var i = 0; i < entries.length; i++) {
+            var e = entries[i]
+            if (e.isSeparator || !e.enabled) continue
+            var label = (e.text || "").replace(/&/g, "")
+            if (/^(quit|exit|close)\b|\b(quit|exit)\b/i.test(label)) {
+                e.triggered()
+                return
+            }
+        }
+        var cls = (item.id || item.title || "").replace(/["\\]/g, "")
+        if (cls !== "")
+            Quickshell.execDetached(["hyprctl", "dispatch", "hl.dsp.window.close({ window = \"class:(?i)" + cls + "\" })"])
+    }
+
+    function trayProgram(item) {
+        return {
+            label: AppIcons.displayName(item.id, item.title),
+            // the tray item's own icon (white parts tinted to Theme.text by the dropdown); the
+            // desktop entry's icon only if the item reports none
+            icon: item.icon || AppIcons.lookup(AppIcons.entryFor(item.id) ? AppIcons.entryFor(item.id).id : item.id),
+            type: "trayitem",
+            action: () => item.activate(),
+            rightclickaction: () => root.closeTrayProgram(item)
+        }
+    }
+
+    readonly property var trayPrograms: {
+        var out = {}
+        for (var i = 0; i < root.trayItems.length; i++) {
+            var item = root.trayItems[i]
+            out["tray:" + (item.id || i)] = root.trayProgram(item)
+        }
+        return out
+    }
+
+    readonly property var programsContent: {
+        var keys = Object.keys(root.trayPrograms)
+        return ["Launcher", "br"].concat(keys.length > 0 ? keys : ["NoPrograms"])
+    }
+
     property var systemMenuItems: ({
+        "Launcher": {
+            label: "Launcher",
+            icon: "\uf002",
+            type: "command",
+            // the search / app launcher (Hyprland binds SUPER to the same IPC call)
+            action: ["qs", "ipc", "call", "search", "toggle"]
+        },
+        "NoPrograms": {
+            label: "No tray programs",
+            type: "info"
+        },
         "Terminal": {
             label: "Terminal",
             icon: "",
@@ -345,8 +431,10 @@ Row {
         property var category: "Window"
     }
 
-    ProgramsDropdown {
+    Dropdown {
         id: programsDropdown
+        property var content: root.programsContent
+        property var category: "Programs"
     }
 
     Dropdown {
