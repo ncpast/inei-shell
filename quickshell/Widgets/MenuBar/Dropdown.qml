@@ -41,12 +41,8 @@ PanelWindow {
             anchors.fill: parent
             color: Qt.rgba(Theme.background.r, Theme.background.g, Theme.background.b, 0.8)
             radius: Theme.button_radius
-            //border.color: Theme.border
-            //border.width: 1
 
-            // wide liquid glass rim (Widgets/shaders/wide_glass_rim.frag) around the menu, drawn from a
-            // hidden copy of its shape; supersampled so it's anti-aliased. Declared before the rows, so
-            // the hover highlights draw over it.
+            // Glass rim
             Rectangle {
                 id: rimShape
                 anchors.fill: parent
@@ -155,7 +151,7 @@ PanelWindow {
                                 opacity: itemEnabled ? 1 : 0.6
                                 font.weight: Font.Medium
                                 id: choiceLabel
-                                elide: Text.ElideRight
+                                elide: item.type === "trayitem" ? Text.ElideRight : Text.ElideNone
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
                                 verticalAlignment: Text.AlignVCenter
