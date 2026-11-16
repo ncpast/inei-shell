@@ -11,6 +11,8 @@ switch="$HOME/.config/hypr/bool/autologin-enabled.lua"
 if grep -Eq 'enabled[[:space:]]*=[[:space:]]*true' "$switch" 2>/dev/null; then
     # the console stays on screen until Hyprland takes over: blank it and hide its blinking cursor
     printf '\033[2J\033[H\033[?25l' 2>/dev/null
-    exec env LOCK_ON_LOGIN=1 /usr/bin/start-hyprland
+    # silence Hyprland's console output (ASCII logo + log lines); its real log is still written to
+    # $XDG_RUNTIME_DIR/hypr/<instance>/hyprland.log
+    exec env LOCK_ON_LOGIN=1 /usr/bin/start-hyprland >/dev/null 2>&1
 fi
 exit 0

@@ -1,5 +1,6 @@
 pragma ComponentBehavior: Bound
 import Quickshell
+import QtQuick.Layouts
 import Quickshell.Io
 import QtQuick
 import "../../Theme"
@@ -24,17 +25,27 @@ Scope {
             title: "Shell Settings"
             implicitWidth: 900
             implicitHeight: 600
-            color: Theme.background
             onClosed: root.shown = false
+            color: "transparent"
 
             // placeholder until the real settings UI exists
-            Text {
-                anchors.centerIn: parent
-                text: "Shell Settings"
-                color: Theme.text
-                font.family: "Inter"
-                font.weight: Font.DemiBold
-                font.pixelSize: 20
+            RowLayout {
+                anchors.fill: parent
+                spacing: 0
+
+                Rectangle {
+                    Layout.fillHeight: true
+                    width: parent.width * 0.2
+                    color: Theme.background
+                    opacity: 0.9
+                }
+
+
+                Rectangle {
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                    color: Theme.background
+                }
             }
         }
     }

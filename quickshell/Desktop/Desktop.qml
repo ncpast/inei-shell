@@ -9,8 +9,8 @@ import "../Utils"
 import "../Widgets"
 
 // Desktop icons: one layer-shell window per monitor on the lowest (Background) layer,
-// so they sit under every window. Visible only while that monitor's active workspace
-// has no windows.
+// so they sit under every window. Mapped only while that monitor's active workspace
+// has no windows; Hyprland fades the layer in and out.
 Variants {
     model: Quickshell.screens
 
@@ -21,8 +21,7 @@ Variants {
 
         // Only as big as the block of grid cells the icons actually occupy. A full-screen
         // transparent surface that fades is expensive for the compositor (it re-composites
-        // the whole screen for every frame of the fade), which made workspace switches
-        // stutter; this window covers only a fraction of the screen.
+        // the whole screen for every frame of the fade); this window covers only a fraction of the screen.
         // Grid geometry is computed from the screen minus the bars, so cells are identical to
         // the old full-area layout.
         readonly property real insetTop: Theme.top_panel_height
@@ -59,58 +58,45 @@ Variants {
         readonly property bool workspaceEmpty: workspace !== null
                                             && !HyprEvents.workspaceApps[workspace.id]
 
-        // Stays mapped for good: creating the layer surface (and its scene graph) each time
-        // the workspace became empty cost a ~40 ms hitch right as the fade started, which
-        // stalled every other animation in the shell. While the icons are hidden the input
-        // region is empty, so clicks pass through to whatever is underneath.
-        visible: true
-        mask: win.workspaceEmpty ? shownRegion : hiddenRegion
-        Region { id: shownRegion; item: content }
-        Region { id: hiddenRegion }
+        // Mapped only while this monitor's workspace is empty. Hyprland fades the layer surface in
+        // and out itself when it maps / unmaps (layer rule in ~/.config/hypr/modules/windowrules.lua,
+        // fadeLayersIn / fadeLayersOut in modules/visual.lua), so there is no fade logic here.
+        //
+        // The map waits until everything is loaded (wallpaper texture for the glass, every icon),
+        // so the first frame Hyprland fades in is complete instead of icons popping in one by one.
+        // The items load while the window is unmapped. Safety net: if that hasn't finished after
+        // loadTimeout ms, show anyway.
+        visible: workspaceEmpty && (loadedOnce || loadTimedOut)
 
-        // ---- fade logic -------------------------------------------------------------
-        // Fading while the workspace slides to/from one with tiled windows made the switch
-        // stutter, so for a switch between an empty desktop and a tiled one the icons snap
-        // in or out instantly. Every other change - opening an app on this desktop, a
-        // workspace that only has floating windows - keeps the normal fade.
-        readonly property int wsId: workspace ? workspace.id : -1
-        property int settledWsId: wsId          // lags wsId by 50 ms, so "wsId !== settledWsId" means "just switched"
-        onWsIdChanged: settleTimer.restart()
-        Timer { id: settleTimer; interval: 50; onTriggered: win.settledWsId = win.wsId }
-
-        readonly property real targetOpacity: workspaceEmpty ? 1 : 0
-
-        NumberAnimation {
-            id: fade
-            target: content
-            property: "opacity"
-            duration: 400
-            easing.type: Easing.OutCubic
-        }
-
-        onTargetOpacityChanged: {
-            fade.stop()
-            // read the workspace directly: the derived wsId property is updated *after* this
-            // handler runs, so it would still hold the previous workspace here
-            var id = workspace ? workspace.id : -1
-            var switched = id !== settledWsId
-            var tiledHere = HyprEvents.workspaceTiled[id] === true
-            // settledWsId still holds the workspace we just left
-            var leftTiled = HyprEvents.workspaceTiled[settledWsId] === true
-            if (switched && ((targetOpacity === 0 && tiledHere) || (targetOpacity === 1 && leftTiled))) {
-                content.opacity = targetOpacity          // instant, both ways
-            } else {
-                fade.to = targetOpacity
-                fade.start()
+        property int readyTick: 0               // bumped whenever an icon finishes loading; re-evaluates iconsReady
+        readonly property bool iconsReady: {
+            readyTick
+            for (var i = 0; i < iconRepeater.count; i++) {
+                var it = iconRepeater.itemAt(i)
+                if (!it || !it.iconDone) return false
             }
+            return true
+        }
+        readonly property bool wallReady: !Theme.tintDesktopIcons || wallImg.source.toString() === ""
+                                          || wallImg.status === Image.Ready || wallImg.status === Image.Error
+        readonly property bool contentReady: iconsReady && wallReady
+
+        // Latched: showing the window makes the images reload for a moment, and following that
+        // would hide it again (a map / unmap loop). Gate only the first map.
+        property bool loadedOnce: false
+        onContentReadyChanged: if (contentReady) loadedOnce = true
+
+        property bool loadTimedOut: false
+        onWorkspaceEmptyChanged: if (!workspaceEmpty) loadTimedOut = false
+        Timer {
+            interval: 400                       // loadTimeout
+            running: win.workspaceEmpty && !win.loadedOnce && !win.loadTimedOut
+            onTriggered: win.loadTimedOut = true
         }
 
         Item {
             id: content
             anchors.fill: parent
-            opacity: 0
-            enabled: win.workspaceEmpty
-            Component.onCompleted: opacity = win.targetOpacity
 
             readonly property real cellW: win.cellW
             readonly property real cellH: win.cellH
@@ -127,16 +113,24 @@ Variants {
                 source: Theme.tintDesktopIcons ? Wallpaper.urlFor(win.modelData.name) : ""
                 sourceSize: Qt.size(width / 2, height / 2)
                 fillMode: Image.PreserveAspectCrop
-                asynchronous: true
+                asynchronous: false     // reloaded on every map: must be there on the first frame
                 visible: false
             }
 
             Repeater {
+                id: iconRepeater
                 model: DesktopIcons.items
 
                 Item {
                     id: cell
                     required property var modelData
+
+                    // icon image finished loading (or has nothing to load / failed)
+                    readonly property bool iconDone: themedIcon.source.toString() === ""
+                                                  || themedIcon.status === Image.Ready
+                                                  || themedIcon.status === Image.Error
+                    onIconDoneChanged: win.readyTick++
+                    Component.onCompleted: win.readyTick++
 
                     x: (modelData.x - win.cells.minX) * content.cellW
                     y: (modelData.y - win.cells.minY) * content.cellH
@@ -185,7 +179,9 @@ Variants {
                                 // The icon: normal / dark / tinted, with frosted glass + rim when tinted
                                 // (Widgets/ThemedIcon.qml)
                                 ThemedIcon {
+                                    id: themedIcon
                                     anchors.fill: parent
+                                    asyncLoad: false
                                     source: iconItem.src
                                     sourceSize: Qt.size(DesktopIcons.iconSize * 4, DesktopIcons.iconSize * 4)
                                     appName: cell.modelData.icon

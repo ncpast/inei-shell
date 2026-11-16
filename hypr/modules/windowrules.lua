@@ -9,7 +9,7 @@ hl.layer_rule({ match = { namespace = "quickshell-notifications" }, blur = true,
 hl.layer_rule({ match = { namespace = "quickshell-osd" },           blur = true, ignore_alpha = 0.5, no_anim = true }) -- volume OSD pill (alpha 0.8) is blurred, its drop shadow (alpha 0.35) isn't
 hl.layer_rule({ match = { namespace = "quickshell-search" },        blur = true, ignore_alpha = 0.5, no_anim = false, animation = "fade" }) -- app search card (alpha 0.68) is blurred, its drop shadow isn't; Hyprland fades the whole layer in/out (layersIn / layersOut, fadeLayersIn / fadeLayersOut)
 hl.layer_rule({ match = { namespace = "quickshell-lock" },            blur = false, no_anim = true }) -- lockscreen fade overlay: opacity is animated in QML
-hl.layer_rule({ match = { namespace = "quickshell-desktop" },        blur = false, order = -1 }) -- desktop icons: no blur; order -1 keeps them above the wallpaper layer (awww)
+hl.layer_rule({ match = { namespace = "quickshell-desktop" },        blur = false, order = -1, no_anim = false, animation = "fade" }) -- desktop icons: no blur; order -1 keeps them above the wallpaper layer (awww); Hyprland fades them in/out as the layer maps/unmaps (fadeLayersIn / fadeLayersOut)
 hl.layer_rule({ match = { namespace = "shell:controlpanel" },         blur = true, ignore_alpha = 0.4 })
 hl.layer_rule({ match = { namespace = "qs_overlay" },                 blur = true, order = -1 }) -- keep overlay beneath other layers
 hl.layer_rule({ match = { namespace = "rofi" },                       blur = true, ignore_alpha = 0.1 })
@@ -95,6 +95,6 @@ hl.window_rule({
 
 hl.window_rule({
     name    = "transparent-windows",
-    match   = { class = "^(discord|org.telegram.desktop|spotify)$" },
+    match   = { class = "^(discord|org.telegram.desktop|spotify|codium)$" },
     opacity = "0.9",
 })
