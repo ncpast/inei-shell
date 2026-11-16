@@ -28,10 +28,6 @@ Item {
     // supersampling for the themed (shader) layers: they render at this many times the icon's size
     // and are scaled down smoothly, which anti-aliases the edges the shaders produce
     property real supersample: 4
-    // Load the image off the GUI thread (default). The desktop turns this off: its window is unmapped and
-    // re-mapped constantly, the images reload on every map, and an async reload shows up as icons popping
-    // in a few frames after Hyprland's fade started.
-    property bool asyncLoad: true
 
     // Is `key` (a name from the settings) this app? Same resolved icon, or the app's name contains
     // the key (ignoring case and punctuation): the same app can resolve to differently named icons,
@@ -119,7 +115,7 @@ Item {
                     height: glass.height
                     source: root.source
                     sourceSize: root.sourceSize
-                    asynchronous: root.asyncLoad
+                    asynchronous: true
                 }
             }
 
@@ -154,7 +150,7 @@ Item {
         anchors.fill: parent
         sourceSize: root.sourceSize
         smooth: true
-        asynchronous: root.asyncLoad
+        asynchronous: true
         source: root.source
         visible: !root.tinted && !root.dark && !root.colored
     }
