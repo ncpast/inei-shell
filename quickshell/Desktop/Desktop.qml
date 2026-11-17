@@ -29,8 +29,8 @@ Variants {
         readonly property real insetLeft: Theme.leftBarHidden ? 0 : Theme.left_panel_width
         readonly property real insetRight: Theme.leftBarHidden ? 0 : Theme.spacer_panel_size
         readonly property real insetBottom: Theme.leftBarHidden ? 0 : Theme.spacer_panel_size
-        readonly property real cellW: (modelData.width - insetLeft - insetRight) / DesktopIcons.columns
-        readonly property real cellH: (modelData.height - insetTop - insetBottom) / DesktopIcons.rows
+        readonly property real cellW: (modelData.width - insetLeft - insetRight - DesktopIcons.horizontalMargins) / DesktopIcons.columns
+        readonly property real cellH: (modelData.height - insetTop - insetBottom - DesktopIcons.bottomMargin) / DesktopIcons.rows
 
         readonly property var cells: {
             var minX = DesktopIcons.columns, maxX = -1, minY = DesktopIcons.rows, maxY = -1
@@ -46,7 +46,7 @@ Variants {
 
         anchors { top: true; left: true }
         exclusionMode: ExclusionMode.Ignore
-        margins.left: insetLeft + cells.minX * cellW
+        margins.left: insetLeft + cells.minX * cellW + DesktopIcons.horizontalMargins / 2
         margins.top: insetTop + cells.minY * cellH
         implicitWidth: cells.cols * cellW
         implicitHeight: cells.rows * cellH

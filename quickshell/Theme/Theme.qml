@@ -125,7 +125,7 @@ QtObject {
     // running apps: glowing border in the accent colour
     readonly property real  dock_icon_corner:     0.225 // corner radius of an icon's border / glow, as a fraction of its size
     readonly property real  dock_glow_width:      1
-    readonly property real  dock_glow_blur:       9
+    readonly property real  dock_glow_blur:       0 // 9 
     readonly property real  dock_glow_opacity:    0.5
     readonly property bool  dock_minimized_preview: true
 

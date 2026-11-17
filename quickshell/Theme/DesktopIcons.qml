@@ -20,18 +20,21 @@ QtObject {
     readonly property int tileWidth: 96
     readonly property int tileHeight: 90
 
+    readonly property int horizontalMargins: 0
+    readonly property int bottomMargin: Theme.dock_icon_size * 1.8
+
     readonly property var items: [
-        { name: "Brave",  icon: "brave",     command: ["brave"],      x: columns-1, y: 0 },
-        { name: "Terminal", icon: "terminal",             command: ["kitty"],      x: columns-1, y: 1 },
-        { name: "Code",     icon: "codium",            command: ["codium"],     x: columns-1, y: 2 },
+        { name: "Brave",  icon: "brave",     command: ["brave"],      x: 0, y: 0 },
+        { name: "Terminal", icon: "terminal",             command: ["kitty"],      x: 0, y: 1 },
+        { name: "Code",     icon: "codium",            command: ["codium"],     x: 0, y: 2 },
 
-        { name: "Discord",    icon: "discord", command: ["discord"],  x: columns-2, y: 0 },
-        { name: "Telegram",    icon: "telegram", command: ["flatpak", "run", "org.telegram.desktop"],  x: columns-2, y: 1 },
-        { name: "Files",    icon: "files", command: ["nautilus"],  x: columns-2, y: 2 },
+        { name: "Discord",    icon: "discord", command: ["discord"],  x: 1, y: 0 },
+        { name: "Telegram",    icon: "telegram", command: ["flatpak", "run", "org.telegram.desktop"],  x: 1, y: 1 },
+        { name: "Files",    icon: "files", command: ["nautilus"],  x: 1, y: 2 },
 
 
-        { name: "Steam",    icon: "steam", command: ["steam"],  x: columns-3, y: 0 },
-        { name: "CS2",    icon: "counter-strike-2", command: ["steam", "steam://rungameid/730"],  x: columns-3, y: 1 },
-        { name: "Spotify",    icon: "spotify", command: ["flatpak", "run", "com.spotify.Client"],  x: columns-3, y: 2 },
+        { name: "Steam",    icon: "steam", command: ["steam"],  x: 2, y: 0 },
+        { name: "CS2",    icon: "counter-strike-2", command: ["steam", "steam://rungameid/730"],  x: 2, y: 1 },
+        { name: "Spotify",    icon: "spotify", command: ["flatpak", "run", "com.spotify.Client"],  x: 2, y: 2 },
     ]
 }

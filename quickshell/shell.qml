@@ -55,13 +55,14 @@ ShellRoot {
             Calculator {}
     
             EmptyBar {
-                anchors { bottom: true; left: true; right: true }
-                implicitHeight: Theme.leftBarHidden ? 0 : Theme.spacer_panel_size
-            }
-
-            EmptyBar {
                 anchors { top: true; left: true; right: true }
                 implicitHeight: Theme.top_panel_height
+            }
+
+            /*
+            EmptyBar {
+                anchors { bottom: true; left: true; right: true }
+                implicitHeight: Theme.leftBarHidden ? 0 : Theme.spacer_panel_size
             }
 
             EmptyBar {
@@ -75,6 +76,7 @@ ShellRoot {
             }
 
             LeftBar { exclusionMode: ExclusionMode.Ignore }
+            */
             TopBar { exclusionMode: ExclusionMode.Ignore }
 
             // after the bars: surfaces on the same layer stack in the order they appear
