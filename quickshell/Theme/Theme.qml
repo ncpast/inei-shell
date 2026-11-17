@@ -94,6 +94,13 @@ QtObject {
     readonly property real  wide_rim_opacity: rim_opacity   // its brightest (corner) parts, 0..1
     readonly property real  wide_rim_reach: 3               // how far the corner highlights extend, in heights
 
+    // Glass text rim (Widgets/shaders/glass_text_rim.frag): the soft bevelled edge of the lock
+    // screen clock's digits (and date), lit from the top-left and bottom-right.
+    readonly property real  text_rim_width: 3.5      // px, band width on the digits
+    readonly property real  text_rim_width_thin: 1.4  // px, on the date (its strokes are only ~3 px thick)
+    readonly property real  text_rim_opacity: 0.9    // its brightest part, 0..1
+    readonly property real  text_rim_floor: 0.45     // how much of that the unlit edges keep, 0..1
+
     // Drop shadows (lock screen, desktop icons, notification cards).
     // blur is a fraction (0..1) of blur_max (px).
     readonly property color shadow_color: Qt.rgba(0, 0, 0, 0.35)

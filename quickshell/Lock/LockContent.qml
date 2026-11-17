@@ -97,6 +97,9 @@ Item {
                 visible: false
                 layer.enabled: true
                 layer.smooth: true
+                // twice the item's size: the rim shader reads the glyph edges from this, and
+                // they need to be sharper than a 1x texture upscaled
+                layer.textureSize: Qt.size(width * 2, height * 2)
 
                 Text {
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -108,11 +111,12 @@ Item {
                 }
 
                 Text {
+                    id: clockTimeText
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: Qt.formatTime(clock.date, "HH:mm")
                     color: "white"
                     font.family: Theme.lock_screen_font
-                    font.weight: Font.Normal
+                    font.weight: Font.Bold
                     font.pixelSize: 140
                     font.letterSpacing: -4
                 }
@@ -159,6 +163,25 @@ Item {
                 colorization: 1
                 colorizationColor: Theme.accent
                 opacity: 0.6
+            }
+
+            // glass rim: a soft highlight along the inside of the glyph outlines
+            // (Widgets/shaders/glass_text_rim.frag), supersampled so it's anti-aliased
+            ShaderEffect {
+                anchors.fill: parent
+                property variant source: clockText
+                property size texel: Qt.size(1 / Math.max(1, width), 1 / Math.max(1, height))
+                property real rimPx: Theme.text_rim_width
+                property real rimPxThin: Theme.text_rim_width_thin
+                // line between the date and the digits (texture y)
+                property real splitY: (clockTimeText.y + clockTimeText.height * 0.1) / Math.max(1, height)
+                property real strength: Theme.text_rim_opacity
+                property real floorLight: Theme.text_rim_floor
+                fragmentShader: Qt.resolvedUrl("../Widgets/shaders/glass_text_rim.frag.qsb")
+                layer.enabled: true
+                layer.smooth: true
+                layer.mipmap: true
+                layer.textureSize: Qt.size(width * 4, height * 4)
             }
         }
 

@@ -1,6 +1,6 @@
 return {
-	accent 		= "rgba(c4e2b9ee)",
-	accent2 	= "rgba(a5d395ee)",
-	text		= "rgb(d7e8cd)",
-	background 	= "rgb(1d211b)"
+	accent 		= "rgba(ffffffee)",
+	accent2 	= "rgba(ffffffee)",
+	text		= "rgb(e2e2e2)",
+	background 	= "rgb(1f1f1f)"
 }
