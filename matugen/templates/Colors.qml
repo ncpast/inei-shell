@@ -10,6 +10,6 @@ QtObject {
     readonly property color border:       '#{{colors.outline.default.hex_stripped}}'  // dividers
 
     readonly property color surface:      '#{{colors.surface.default.hex_stripped}}'  // panels / popovers
-    readonly property color text:         '#{{colors.on_primary_container.default.hex_stripped}}'  // primary text
-    readonly property color accent:       '#{{colors.primary.default.hex_stripped}}'  // orange (unchanged)
+    readonly property color text:         '#{{colors.on_secondary_container.default.hex_stripped}}'  // primary text
+    readonly property color accent:       '#{{colors.primary.default.hex_stripped}}'  // accent
 }
