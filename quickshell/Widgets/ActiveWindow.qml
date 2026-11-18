@@ -41,7 +41,7 @@ Item {
         font.pixelSize: 13
         font.family: "Inter"
         font.weight: Font.DemiBold
-        text: "0".repeat(33)
+        text: "0".repeat(25)
     }
 
     property var player: {
@@ -73,10 +73,9 @@ Item {
 
     property string mediaText: {
         if (!hasMedia) return ""
-        var t = player.trackArtist !== ""
+        return player.trackArtist !== ""
             ? player.trackArtist + "  •  " + player.trackTitle
             : player.trackTitle
-        return t.length > 40 ? t.slice(0, 37) + "..." : t
     }
 
     onMediaTextChanged: {
@@ -151,6 +150,8 @@ Item {
         source: activeWindowNameApplet
     }
 
+    // Active window title //
+
     Rectangle {
         id: activeWindowNameApplet
         color: "transparent"
@@ -178,6 +179,8 @@ Item {
             }
         }
 
+        // Media row //
+
         Row {
             id: mediaRow
             anchors.centerIn: parent
@@ -186,6 +189,8 @@ Item {
             enabled: root.hasMedia && !root.showWorkspaces
             Behavior on opacity { NumberAnimation { duration: 200 } }
 
+
+            // Buttons
             Row {
                 spacing: 8
                 anchors.verticalCenter: parent.verticalCenter
@@ -256,17 +261,87 @@ Item {
                 }
             }
 
-            Text {
+            // Media title running line //
+            Item {
                 id: media
                 anchors.verticalCenter: parent.verticalCenter
                 width: mediaMetrics.width
-                elide: Text.ElideRight
-                horizontalAlignment: Text.AlignHCenter
-                text: root.shownMediaText
-                color: Theme.text
-                font.pixelSize: 13
-                font.family: "Inter"
-                font.weight: Font.DemiBold
+                height: Math.max(mediaLine.height, 16)
+                clip: true
+
+                readonly property real gap: 20
+                readonly property real speed: 20
+                readonly property real edgeFade: 18     // px, width of the transparency gradient at each side
+                readonly property real unit: mediaLine.width + gap
+
+                // how far the strip moves per loop: one iteration plus its gap, so the loop is seamless
+                onUnitChanged: scroll.restart()
+
+                // The fade is applied to this (visible) item as its layer effect. Don't move the text
+                // into a hidden item that only feeds an OpacityMask: a change in a hidden source
+                // doesn't schedule a repaint, so with nothing else animating the line froze.
+                layer.enabled: true
+                layer.smooth: true
+                layer.effect: OpacityMask {
+                    maskSource: mediaFadeMask
+                }
+
+                TextMetrics {
+                    id: mediaLine
+                    font: mediaFont.font
+                    text: root.shownMediaText
+                }
+
+                // font source for the copies and the metrics (never drawn)
+                Text {
+                    id: mediaFont
+                    visible: false
+                    font.pixelSize: 13
+                    font.family: "Inter"
+                    font.weight: Font.DemiBold
+                }
+
+                // opaque in the middle, transparent at both ends (mask for the layer effect)
+                Rectangle {
+                    id: mediaFadeMask
+                    width: media.width
+                    height: media.height
+                    visible: false
+                    layer.enabled: true
+                    layer.smooth: true
+                    gradient: Gradient {
+                        orientation: Gradient.Horizontal
+                        GradientStop { position: 0; color: "transparent" }
+                        GradientStop { position: Math.min(0.5, media.edgeFade / media.width); color: "black" }
+                        GradientStop { position: Math.max(0.5, 1 - media.edgeFade / media.width); color: "black" }
+                        GradientStop { position: 1; color: "transparent" }
+                    }
+                }
+
+                Row {
+                    id: strip
+                    spacing: media.gap
+
+                    // enough copies to always fill the window while one scrolls out
+                    Repeater {
+                        model: Math.ceil(media.width / Math.max(1, media.unit)) + 1
+
+                        Text {
+                            text: root.shownMediaText
+                            color: Theme.text
+                            font: mediaFont.font
+                        }
+                    }
+
+                    NumberAnimation on x {
+                        id: scroll
+                        from: 0
+                        to: -media.unit
+                        duration: Math.max(1, media.unit / media.speed * 1000)
+                        loops: Animation.Infinite
+                        running: root.hasMedia && !root.showWorkspaces && root.shownMediaText !== ""
+                    }
+                }
             }
 
             Row {
@@ -291,6 +366,8 @@ Item {
                 }
             }
         }
+
+        // Workspaces //
 
         Row {
             id: dots
